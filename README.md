@@ -1,6 +1,6 @@
 # Mouse Gestures Browser Extension
 
-**Version:** 1.1.1
+**Version:** 1.1.2
 **Last Update:** 2025-10-07
 
 A simple and elegant mouse gesture extension for Brave and Chrome browsers with a purple gesture trail.
@@ -60,6 +60,15 @@ This extension follows:
 - Proper resource cleanup
 
 ## Version History
+
+### 1.1.2 (2025-10-07)
+- **MAJOR REDESIGN**: Implemented proper 500ms long-press detection
+- Short click (< 500ms) → shows context menu
+- Long press (≥ 500ms) → enters gesture mode, shows purple trail, suppresses menu
+- Any mouse movement → immediately enters gesture mode, shows trail, executes gesture
+- Added `inGestureMode` flag to track gesture state
+- Purple trail now appears on long press even without movement
+- Fixed all context menu behavior to match user expectations
 
 ### 1.1.1 (2025-10-07)
 - **CRITICAL FIX**: Context menu now works correctly for all click durations

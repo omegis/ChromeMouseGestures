@@ -1,6 +1,6 @@
 /**
  * Mouse Gestures Extension - Content Script
- * Version: 1.1.1
+ * Version: 1.1.2
  * Last Update: 2025-10-07
  */
 
@@ -14,6 +14,7 @@ class MouseGestureDetector {
     this.minDistance = 50; // Minimum distance to recognize a direction
     this.gestureDrawn = false; // Track if gesture was drawn
     this.suppressContextMenu = false; // Flag to suppress context menu
+    this.inGestureMode = false; // Track if in gesture mode (long press or movement)
 
     this.init();
   }
@@ -51,35 +52,46 @@ class MouseGestureDetector {
     console.log('[Mouse Gestures] Starting gesture detection');
     this.isDrawing = true;
     this.gestureDrawn = false;
-    this.suppressContextMenu = false; // Don't suppress yet - wait for movement
+    this.suppressContextMenu = false;
+    this.inGestureMode = false; // Not in gesture mode yet
     this.gesturePoints = [{ x: e.clientX, y: e.clientY }];
     this.mouseDownTime = Date.now(); // Track when mouse was pressed
-    this.createTrailSvg();
 
-    // Set a timeout - if held for more than 200ms without movement, suppress menu
+    // Set a timeout - if held for more than 500ms, enter gesture mode
     this.longPressTimer = setTimeout(() => {
-      if (this.isDrawing && this.gesturePoints.length <= 1) {
-        console.log('[Mouse Gestures] Long press detected - will suppress context menu');
+      if (this.isDrawing) {
+        console.log('[Mouse Gestures] Long press (500ms) - entering gesture mode');
+        this.inGestureMode = true;
         this.suppressContextMenu = true;
+        // Create trail on long press
+        if (!this.trailSvg) {
+          this.createTrailSvg();
+        }
       }
-    }, 200);
+    }, 500);
   }
 
   handleMouseMove(e) {
     if (!this.isDrawing || !this.isEnabled) return;
 
     this.gesturePoints.push({ x: e.clientX, y: e.clientY });
-    this.updateTrail();
 
-    // Suppress context menu on ANY movement - user is drawing a gesture
-    if (!this.suppressContextMenu) {
-      console.log('[Mouse Gestures] Movement detected - will suppress context menu');
+    // Enter gesture mode on any movement
+    if (!this.inGestureMode) {
+      console.log('[Mouse Gestures] Movement detected - entering gesture mode');
+      this.inGestureMode = true;
       this.suppressContextMenu = true;
+      // Create trail if not already created
+      if (!this.trailSvg) {
+        this.createTrailSvg();
+      }
     }
+
+    this.updateTrail();
   }
 
   handleMouseUp(e) {
-    console.log('[Mouse Gestures] MouseUp - button:', e.button, 'isDrawing:', this.isDrawing, 'enabled:', this.isEnabled, 'points:', this.gesturePoints.length);
+    console.log('[Mouse Gestures] MouseUp - button:', e.button, 'isDrawing:', this.isDrawing, 'enabled:', this.isEnabled, 'points:', this.gesturePoints.length, 'inGestureMode:', this.inGestureMode);
 
     // Clear the long press timer
     if (this.longPressTimer) {
@@ -91,22 +103,29 @@ class MouseGestureDetector {
     if (this.isDrawing) {
       console.log('[Mouse Gestures] Cleaning up gesture, had', this.gesturePoints.length, 'points');
 
-      // If there was no movement (just a click), allow context menu regardless of duration
-      // This handles both short clicks and long clicks without movement
-      if (this.gesturePoints.length <= 1) {
-        console.log('[Mouse Gestures] No movement detected - allowing context menu');
+      // Check if this was a short click (< 500ms) without entering gesture mode
+      const clickDuration = Date.now() - this.mouseDownTime;
+      const isShortClick = clickDuration < 500 && !this.inGestureMode;
+
+      if (isShortClick) {
+        console.log('[Mouse Gestures] Short click detected (< 500ms) - allowing context menu');
         this.suppressContextMenu = false;
+      } else {
+        console.log('[Mouse Gestures] Long press or gesture - suppressing context menu');
+        this.suppressContextMenu = true;
+
+        // Only try to recognize gesture if we're in gesture mode
+        if (this.inGestureMode) {
+          const gesture = this.recognizeGesture();
+          if (gesture) {
+            this.gestureDrawn = true;
+            this.executeGesture(gesture);
+          }
+        }
       }
 
       this.isDrawing = false;
-
-      const gesture = this.recognizeGesture();
-
-      if (gesture) {
-        this.gestureDrawn = true;
-        this.suppressContextMenu = true; // Definitely suppress if gesture recognized
-        this.executeGesture(gesture);
-      }
+      this.inGestureMode = false;
 
       this.removeTrail();
       this.gesturePoints = [];

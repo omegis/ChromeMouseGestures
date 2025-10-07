@@ -1,6 +1,6 @@
 /**
  * Mouse Gestures Extension - Content Script
- * Version: 1.0.2
+ * Version: 1.0.3
  * Last Update: 2025-10-07
  */
 
@@ -124,28 +124,39 @@ class MouseGestureDetector {
     if (this.gesturePoints.length < 2) return null;
 
     const directions = this.getDirections();
-    if (directions.length < 2) return null; // Need at least 2 directions
+    console.log('[Mouse Gestures] Detected directions:', directions);
+
+    if (directions.length < 2) {
+      console.log('[Mouse Gestures] Not enough directions, need at least 2');
+      return null;
+    }
 
     const pattern = directions.join('-');
+    console.log('[Mouse Gestures] Pattern:', pattern);
 
     // Match gesture patterns - order matters!
     // Reload: up then down (or down then up)
     if ((pattern === 'up-down') || (pattern === 'down-up')) {
+      console.log('[Mouse Gestures] Recognized: RELOAD');
       return 'reload';
     }
     // Close: down then right
     if (pattern === 'down-right' || pattern.startsWith('down-right')) {
+      console.log('[Mouse Gestures] Recognized: CLOSE TAB');
       return 'close';
     }
     // Next tab: up then right
     if (pattern === 'up-right' || pattern.startsWith('up-right')) {
+      console.log('[Mouse Gestures] Recognized: NEXT TAB');
       return 'nextTab';
     }
     // Previous tab: up then left
     if (pattern === 'up-left' || pattern.startsWith('up-left')) {
+      console.log('[Mouse Gestures] Recognized: PREVIOUS TAB');
       return 'prevTab';
     }
 
+    console.log('[Mouse Gestures] No matching gesture pattern');
     return null;
   }
 
@@ -188,10 +199,14 @@ class MouseGestureDetector {
   }
 
   executeGesture(gesture) {
+    console.log('[Mouse Gestures] Executing gesture:', gesture);
+
     // Send message to background script
     chrome.runtime.sendMessage({ action: gesture }, (response) => {
       if (chrome.runtime.lastError) {
-        console.error('Gesture execution error:', chrome.runtime.lastError);
+        console.error('[Mouse Gestures] ERROR:', chrome.runtime.lastError);
+      } else {
+        console.log('[Mouse Gestures] Response from background:', response);
       }
     });
   }

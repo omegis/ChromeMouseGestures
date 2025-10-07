@@ -1,7 +1,7 @@
 {
   "manifest_version": 3,
   "name": "Mouse Gestures",
-  "version": "1.0.2",
+  "version": "1.0.3",
   "description": "Simple mouse gesture extension with purple trail - reload, close, and navigate tabs",
   "permissions": [
     "tabs",

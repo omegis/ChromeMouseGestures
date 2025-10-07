@@ -1,24 +1,30 @@
 /**
  * Mouse Gestures Extension - Background Service Worker
- * Version: 1.0.2
+ * Version: 1.0.3
  * Last Update: 2025-10-07
  */
 
 console.log('Mouse Gestures Extension - Background Service Worker Started');
-console.log('Version: 1.0.2');
+console.log('Version: 1.0.3');
 console.log('Last Update: 2025-10-07');
 
 // Listen for messages from content scripts
 chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
+  console.log('[Background] Received message:', request, 'from tab:', sender.tab?.id);
+
   if (!request.action) {
+    console.error('[Background] No action specified in request');
     sendResponse({ success: false, error: 'No action specified' });
     return;
   }
 
   handleGestureAction(request.action, sender.tab)
-    .then(() => sendResponse({ success: true }))
+    .then(() => {
+      console.log('[Background] Action completed successfully:', request.action);
+      sendResponse({ success: true });
+    })
     .catch((error) => {
-      console.error('Action error:', error);
+      console.error('[Background] Action error:', error);
       sendResponse({ success: false, error: error.message });
     });
 
@@ -31,24 +37,30 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
  * @param {object} tab - The tab object from the sender
  */
 async function handleGestureAction(action, tab) {
+  console.log('[Background] Handling action:', action, 'for tab:', tab?.id);
+
   if (!tab || !tab.id) {
     throw new Error('Invalid tab');
   }
 
   switch (action) {
     case 'reload':
+      console.log('[Background] Reloading tab', tab.id);
       await reloadTab(tab.id);
       break;
 
     case 'close':
+      console.log('[Background] Closing tab', tab.id);
       await closeTab(tab.id);
       break;
 
     case 'nextTab':
+      console.log('[Background] Switching to next tab');
       await switchToNextTab(tab);
       break;
 
     case 'prevTab':
+      console.log('[Background] Switching to previous tab');
       await switchToPrevTab(tab);
       break;
 

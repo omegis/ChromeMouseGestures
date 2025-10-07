@@ -1,6 +1,6 @@
 # Mouse Gestures Browser Extension
 
-**Version:** 1.3.0
+**Version:** 1.3.1
 **Last Update:** 2025-10-07
 
 A simple and elegant mouse gesture extension for Brave and Chrome browsers with a purple gesture trail.
@@ -65,6 +65,16 @@ This extension follows:
 - Proper resource cleanup
 
 ## Version History
+
+### 1.3.1 (2025-10-07)
+- **NEW FEATURE**: Optional debug logging toggle in extension menu
+- Added "Debug Logging" toggle to popup UI
+- Debug logging disabled by default (improves performance)
+- All console.log statements now check debugLogging flag
+- Added `log()` method that wraps console.log with debug check
+- Settings stored in chrome.storage.sync
+- Changes take effect immediately via storage change listener
+- Keeps console clean unless debugging is needed
 
 ### 1.3.0 (2025-10-07)
 - **MAJOR FEATURE**: Double right-click to show context menu

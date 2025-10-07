@@ -7,6 +7,7 @@
 class MouseGestureDetector {
   constructor() {
     this.isEnabled = true;
+    this.debugLogging = false; // Debug logging disabled by default
     this.isDrawing = false;
     this.gesturePoints = [];
     this.trailSvg = null;
@@ -21,22 +22,33 @@ class MouseGestureDetector {
     this.init();
   }
 
+  log(...args) {
+    if (this.debugLogging) {
+      console.log(...args);
+    }
+  }
+
   init() {
     // Load enabled state - check if chrome.storage is available
     if (typeof chrome !== 'undefined' && chrome.storage && chrome.storage.sync) {
-      chrome.storage.sync.get(['gesturesEnabled'], (result) => {
+      chrome.storage.sync.get(['gesturesEnabled', 'debugLogging'], (result) => {
         this.isEnabled = result.gesturesEnabled !== false; // Default to true
+        this.debugLogging = result.debugLogging === true; // Default to false
       });
 
-      // Listen for enable/disable changes
+      // Listen for setting changes
       chrome.storage.onChanged.addListener((changes) => {
         if (changes.gesturesEnabled) {
           this.isEnabled = changes.gesturesEnabled.newValue;
+        }
+        if (changes.debugLogging) {
+          this.debugLogging = changes.debugLogging.newValue;
         }
       });
     } else {
       console.warn('[Mouse Gestures] chrome.storage not available - using default enabled state');
       this.isEnabled = true; // Default to enabled
+      this.debugLogging = false; // Default to disabled
     }
 
     // Bind event listeners - use capture phase for mousedown and contextmenu
@@ -47,7 +59,7 @@ class MouseGestureDetector {
   }
 
   handleMouseDown(e) {
-    console.log('[Mouse Gestures] MouseDown - button:', e.button, 'enabled:', this.isEnabled);
+    this.log('[Mouse Gestures] MouseDown - button:', e.button, 'enabled:', this.isEnabled);
 
     if (!this.isEnabled || e.button !== 2) return; // Only right-click
 
@@ -56,13 +68,13 @@ class MouseGestureDetector {
 
     // Check for double right-click
     if (timeSinceLastClick < this.doubleClickTimeout) {
-      console.log('[Mouse Gestures] Double right-click detected - will show context menu');
+      this.log('[Mouse Gestures] Double right-click detected - will show context menu');
       this.allowContextMenu = true;
       this.lastRightClickTime = 0; // Reset to prevent triple-click from being detected as double
       return; // Don't start gesture detection
     }
 
-    console.log('[Mouse Gestures] Starting gesture detection');
+    this.log('[Mouse Gestures] Starting gesture detection');
     this.lastRightClickTime = now;
     this.isDrawing = true;
     this.gestureDrawn = false;
@@ -74,7 +86,7 @@ class MouseGestureDetector {
     // Set a timeout - if held for more than 500ms, enter gesture mode
     this.longPressTimer = setTimeout(() => {
       if (this.isDrawing) {
-        console.log('[Mouse Gestures] Long press (500ms) - entering gesture mode');
+        this.log('[Mouse Gestures] Long press (500ms) - entering gesture mode');
         this.inGestureMode = true;
         // Create trail on long press
         if (!this.trailSvg) {
@@ -91,7 +103,7 @@ class MouseGestureDetector {
 
     // Enter gesture mode on any movement
     if (!this.inGestureMode) {
-      console.log('[Mouse Gestures] Movement detected - entering gesture mode');
+      this.log('[Mouse Gestures] Movement detected - entering gesture mode');
       this.inGestureMode = true;
       this.suppressContextMenu = true;
       // Create trail if not already created
@@ -104,7 +116,7 @@ class MouseGestureDetector {
   }
 
   handleMouseUp(e) {
-    console.log('[Mouse Gestures] MouseUp - button:', e.button, 'isDrawing:', this.isDrawing, 'enabled:', this.isEnabled, 'points:', this.gesturePoints.length, 'inGestureMode:', this.inGestureMode);
+    this.log('[Mouse Gestures] MouseUp - button:', e.button, 'isDrawing:', this.isDrawing, 'enabled:', this.isEnabled, 'points:', this.gesturePoints.length, 'inGestureMode:', this.inGestureMode);
 
     // Clear the long press timer
     if (this.longPressTimer) {
@@ -115,18 +127,18 @@ class MouseGestureDetector {
     // Only handle right-click release
     if (!this.isDrawing || e.button !== 2) return;
 
-    console.log('[Mouse Gestures] Cleaning up gesture, had', this.gesturePoints.length, 'points');
+    this.log('[Mouse Gestures] Cleaning up gesture, had', this.gesturePoints.length, 'points');
 
     // If we're in gesture mode, try to recognize and execute gesture
     if (this.inGestureMode) {
-      console.log('[Mouse Gestures] In gesture mode - checking for gesture');
+      this.log('[Mouse Gestures] In gesture mode - checking for gesture');
       const gesture = this.recognizeGesture();
       if (gesture) {
         this.gestureDrawn = true;
         this.executeGesture(gesture);
       }
     } else {
-      console.log('[Mouse Gestures] NOT in gesture mode - allowing context menu naturally');
+      this.log('[Mouse Gestures] NOT in gesture mode - allowing context menu naturally');
       // Short click - let the natural contextmenu event fire
       // Don't suppress it
     }
@@ -142,18 +154,18 @@ class MouseGestureDetector {
   handleContextMenu(e) {
     if (!this.isEnabled) return;
 
-    console.log('[Mouse Gestures] ContextMenu event - allowContextMenu:', this.allowContextMenu, 'inGestureMode:', this.inGestureMode, 'gestureDrawn:', this.gestureDrawn);
+    this.log('[Mouse Gestures] ContextMenu event - allowContextMenu:', this.allowContextMenu, 'inGestureMode:', this.inGestureMode, 'gestureDrawn:', this.gestureDrawn);
 
     // Allow context menu on double right-click
     if (this.allowContextMenu) {
-      console.log('[Mouse Gestures] Allowing context menu - double right-click detected');
+      this.log('[Mouse Gestures] Allowing context menu - double right-click detected');
       this.allowContextMenu = false; // Reset flag
       return; // Let the menu show
     }
 
     // Suppress context menu if we're in gesture mode or gesture was drawn
     // This includes single clicks, long press, and gestures
-    console.log('[Mouse Gestures] Suppressing context menu - gesture detection active');
+    this.log('[Mouse Gestures] Suppressing context menu - gesture detection active');
     e.preventDefault();
     e.stopPropagation();
     e.stopImmediatePropagation();
@@ -203,10 +215,10 @@ class MouseGestureDetector {
   }
 
   removeTrail() {
-    console.log('[Mouse Gestures] Removing trail, exists:', !!this.trailSvg);
+    this.log('[Mouse Gestures] Removing trail, exists:', !!this.trailSvg);
     if (this.trailSvg && this.trailSvg.parentNode) {
       this.trailSvg.parentNode.removeChild(this.trailSvg);
-      console.log('[Mouse Gestures] Trail removed from DOM');
+      this.log('[Mouse Gestures] Trail removed from DOM');
     }
     this.trailSvg = null;
     this.trailPath = null;
@@ -216,39 +228,39 @@ class MouseGestureDetector {
     if (this.gesturePoints.length < 2) return null;
 
     const directions = this.getDirections();
-    console.log('[Mouse Gestures] Detected directions:', directions);
+    this.log('[Mouse Gestures] Detected directions:', directions);
 
     if (directions.length < 2) {
-      console.log('[Mouse Gestures] Not enough directions, need at least 2');
+      this.log('[Mouse Gestures] Not enough directions, need at least 2');
       return null;
     }
 
     const pattern = directions.join('-');
-    console.log('[Mouse Gestures] Pattern:', pattern);
+    this.log('[Mouse Gestures] Pattern:', pattern);
 
     // Match gesture patterns - order matters!
     // Reload: up then down (or down then up)
     if ((pattern === 'up-down') || (pattern === 'down-up')) {
-      console.log('[Mouse Gestures] Recognized: RELOAD');
+      this.log('[Mouse Gestures] Recognized: RELOAD');
       return 'reload';
     }
     // Close: down then right
     if (pattern === 'down-right' || pattern.startsWith('down-right')) {
-      console.log('[Mouse Gestures] Recognized: CLOSE TAB');
+      this.log('[Mouse Gestures] Recognized: CLOSE TAB');
       return 'close';
     }
     // Next tab: up then right
     if (pattern === 'up-right' || pattern.startsWith('up-right')) {
-      console.log('[Mouse Gestures] Recognized: NEXT TAB');
+      this.log('[Mouse Gestures] Recognized: NEXT TAB');
       return 'nextTab';
     }
     // Previous tab: up then left
     if (pattern === 'up-left' || pattern.startsWith('up-left')) {
-      console.log('[Mouse Gestures] Recognized: PREVIOUS TAB');
+      this.log('[Mouse Gestures] Recognized: PREVIOUS TAB');
       return 'prevTab';
     }
 
-    console.log('[Mouse Gestures] No matching gesture pattern');
+    this.log('[Mouse Gestures] No matching gesture pattern');
     return null;
   }
 
@@ -291,7 +303,7 @@ class MouseGestureDetector {
   }
 
   executeGesture(gesture) {
-    console.log('[Mouse Gestures] Executing gesture:', gesture);
+    this.log('[Mouse Gestures] Executing gesture:', gesture);
 
     // Show toast notification
     this.showToast(gesture);
@@ -302,7 +314,7 @@ class MouseGestureDetector {
         if (chrome.runtime.lastError) {
           console.error('[Mouse Gestures] ERROR:', chrome.runtime.lastError);
         } else {
-          console.log('[Mouse Gestures] Response from background:', response);
+          this.log('[Mouse Gestures] Response from background:', response);
         }
       });
     } else {

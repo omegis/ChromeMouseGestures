@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <title>Mouse Gestures</title>
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <div class="container">
+    <h1>🖱️ Mouse Gestures</h1>
+    <div class="version">v1.0.0</div>
+
+    <div class="toggle-section">
+      <label class="toggle-container">
+        <span class="toggle-label">Enable Gestures</span>
+        <input type="checkbox" id="enableToggle" checked>
+        <span class="toggle-slider"></span>
+      </label>
+    </div>
+
+    <div class="gestures-info">
+      <h2>Available Gestures</h2>
+      <ul>
+        <li><strong>↑↓</strong> Reload Page</li>
+        <li><strong>↓→</strong> Close Tab</li>
+        <li><strong>↑→</strong> Next Tab</li>
+        <li><strong>↑←</strong> Previous Tab</li>
+      </ul>
+      <p class="hint">Hold right-click and draw gestures</p>
+    </div>
+  </div>
+
+  <script src="popup.js"></script>
+</body>
+</html>

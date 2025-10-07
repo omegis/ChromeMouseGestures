@@ -1,9 +1,11 @@
 # Mouse Gestures Browser Extension
 
-**Version:** 1.2.1
+**Version:** 1.3.0
 **Last Update:** 2025-10-07
 
 A simple and elegant mouse gesture extension for Brave and Chrome browsers with a purple gesture trail.
+
+**How to access context menu:** Double right-click!
 
 ## Features
 
@@ -31,12 +33,15 @@ A simple and elegant mouse gesture extension for Brave and Chrome browsers with 
 
 ## Usage
 
+**Gestures:**
 1. Hold down the **right mouse button**
-2. Draw one of the gesture patterns
+2. Draw one of the gesture patterns (or hold for 500ms)
 3. Release the mouse button
 4. The action will be executed
 
-**Note:** The context menu will be suppressed when drawing gestures.
+**Context Menu:**
+- **Double right-click** to show the context menu
+- Single right-click will suppress the menu (gesture mode active)
 
 ## Enable/Disable
 
@@ -60,6 +65,19 @@ This extension follows:
 - Proper resource cleanup
 
 ## Version History
+
+### 1.3.0 (2025-10-07)
+- **MAJOR FEATURE**: Double right-click to show context menu
+- Learned from crxMouse extension: use double-click pattern
+- Added `lastRightClickTime` tracking for double-click detection
+- Added `allowContextMenu` flag for double-click behavior
+- Double-click timeout set to 300ms (industry standard)
+- Single right-click: suppress menu, enter gesture mode
+- Double right-click (< 300ms apart): show context menu
+- Long press (≥ 500ms): show purple trail, suppress menu
+- Mouse movement: show purple trail, suppress menu, execute gesture
+- This is a major version bump due to new user interaction pattern
+- Updated documentation with double-click instructions
 
 ### 1.2.1 (2025-10-07)
 - **FINAL FIX**: Selective context menu suppression based on gesture mode

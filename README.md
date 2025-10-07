@@ -1,6 +1,6 @@
 # Mouse Gestures Browser Extension
 
-**Version:** 1.0.8
+**Version:** 1.0.9
 **Last Update:** 2025-10-07
 
 A simple and elegant mouse gesture extension for Brave and Chrome browsers with a purple gesture trail.
@@ -60,6 +60,13 @@ This extension follows:
 - Proper resource cleanup
 
 ## Version History
+
+### 1.0.9 (2025-10-07)
+- **BUG FIX**: Fixed chrome.runtime undefined error on certain pages
+- Added safety checks for chrome.runtime and chrome.storage APIs
+- Extension now gracefully handles contexts where Chrome APIs are unavailable
+- Gesture recognition and toast still work even if background communication fails
+- Prevents console errors on pages with strict content security policies
 
 ### 1.0.8 (2025-10-07)
 - **NEW FEATURE**: Toast notification for executed commands

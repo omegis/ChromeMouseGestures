@@ -1,6 +1,6 @@
 /**
  * Mouse Gestures Extension - Content Script
- * Version: 1.0.8
+ * Version: 1.0.9
  * Last Update: 2025-10-07
  */
 
@@ -19,17 +19,22 @@ class MouseGestureDetector {
   }
 
   init() {
-    // Load enabled state
-    chrome.storage.sync.get(['gesturesEnabled'], (result) => {
-      this.isEnabled = result.gesturesEnabled !== false; // Default to true
-    });
+    // Load enabled state - check if chrome.storage is available
+    if (typeof chrome !== 'undefined' && chrome.storage && chrome.storage.sync) {
+      chrome.storage.sync.get(['gesturesEnabled'], (result) => {
+        this.isEnabled = result.gesturesEnabled !== false; // Default to true
+      });
 
-    // Listen for enable/disable changes
-    chrome.storage.onChanged.addListener((changes) => {
-      if (changes.gesturesEnabled) {
-        this.isEnabled = changes.gesturesEnabled.newValue;
-      }
-    });
+      // Listen for enable/disable changes
+      chrome.storage.onChanged.addListener((changes) => {
+        if (changes.gesturesEnabled) {
+          this.isEnabled = changes.gesturesEnabled.newValue;
+        }
+      });
+    } else {
+      console.warn('[Mouse Gestures] chrome.storage not available - using default enabled state');
+      this.isEnabled = true; // Default to enabled
+    }
 
     // Bind event listeners - use capture phase for mousedown and contextmenu
     document.addEventListener('mousedown', this.handleMouseDown.bind(this), true);
@@ -229,14 +234,18 @@ class MouseGestureDetector {
     // Show toast notification
     this.showToast(gesture);
 
-    // Send message to background script
-    chrome.runtime.sendMessage({ action: gesture }, (response) => {
-      if (chrome.runtime.lastError) {
-        console.error('[Mouse Gestures] ERROR:', chrome.runtime.lastError);
-      } else {
-        console.log('[Mouse Gestures] Response from background:', response);
-      }
-    });
+    // Send message to background script - check if chrome.runtime is available
+    if (typeof chrome !== 'undefined' && chrome.runtime && chrome.runtime.sendMessage) {
+      chrome.runtime.sendMessage({ action: gesture }, (response) => {
+        if (chrome.runtime.lastError) {
+          console.error('[Mouse Gestures] ERROR:', chrome.runtime.lastError);
+        } else {
+          console.log('[Mouse Gestures] Response from background:', response);
+        }
+      });
+    } else {
+      console.warn('[Mouse Gestures] chrome.runtime not available - gesture recognized but cannot execute action');
+    }
   }
 
   showToast(gesture) {

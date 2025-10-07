@@ -1,11 +1,11 @@
 /**
  * Mouse Gestures Extension - Background Service Worker
- * Version: 1.1.0
+ * Version: 1.1.1
  * Last Update: 2025-10-07
  */
 
 console.log('Mouse Gestures Extension - Background Service Worker Started');
-console.log('Version: 1.1.0');
+console.log('Version: 1.1.1');
 console.log('Last Update: 2025-10-07');
 
 // Listen for messages from content scripts

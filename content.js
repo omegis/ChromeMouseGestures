@@ -1,6 +1,6 @@
 /**
  * Mouse Gestures Extension - Content Script
- * Version: 1.1.0
+ * Version: 1.1.1
  * Last Update: 2025-10-07
  */
 
@@ -91,12 +91,10 @@ class MouseGestureDetector {
     if (this.isDrawing) {
       console.log('[Mouse Gestures] Cleaning up gesture, had', this.gesturePoints.length, 'points');
 
-      // Check if this was a quick click (< 200ms and no movement)
-      const clickDuration = Date.now() - this.mouseDownTime;
-      const isQuickClick = clickDuration < 200 && this.gesturePoints.length <= 1;
-
-      if (isQuickClick) {
-        console.log('[Mouse Gestures] Quick click detected - allowing context menu');
+      // If there was no movement (just a click), allow context menu regardless of duration
+      // This handles both short clicks and long clicks without movement
+      if (this.gesturePoints.length <= 1) {
+        console.log('[Mouse Gestures] No movement detected - allowing context menu');
         this.suppressContextMenu = false;
       }
 

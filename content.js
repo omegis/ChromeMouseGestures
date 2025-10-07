@@ -1,6 +1,6 @@
 /**
  * Mouse Gestures Extension - Content Script
- * Version: 1.0.4
+ * Version: 1.0.5
  * Last Update: 2025-10-07
  */
 
@@ -13,6 +13,7 @@ class MouseGestureDetector {
     this.trailPath = null;
     this.minDistance = 50; // Minimum distance to recognize a direction
     this.gestureDrawn = false; // Track if gesture was drawn
+    this.suppressContextMenu = false; // Flag to suppress context menu
 
     this.init();
   }
@@ -45,6 +46,7 @@ class MouseGestureDetector {
     console.log('[Mouse Gestures] Starting gesture drawing');
     this.isDrawing = true;
     this.gestureDrawn = false;
+    this.suppressContextMenu = false; // Reset flag
     this.gesturePoints = [{ x: e.clientX, y: e.clientY }];
     this.createTrailSvg();
   }
@@ -54,20 +56,27 @@ class MouseGestureDetector {
 
     this.gesturePoints.push({ x: e.clientX, y: e.clientY });
     this.updateTrail();
+
+    // If we've moved while drawing, suppress context menu
+    if (this.gesturePoints.length > 3) {
+      this.suppressContextMenu = true;
+      console.log('[Mouse Gestures] Movement detected, will suppress context menu');
+    }
   }
 
   handleMouseUp(e) {
-    console.log('[Mouse Gestures] MouseUp - button:', e.button, 'isDrawing:', this.isDrawing, 'enabled:', this.isEnabled);
+    console.log('[Mouse Gestures] MouseUp - button:', e.button, 'isDrawing:', this.isDrawing, 'enabled:', this.isEnabled, 'points:', this.gesturePoints.length);
 
     // Always clean up if we were drawing, regardless of button
     if (this.isDrawing) {
-      console.log('[Mouse Gestures] Cleaning up gesture');
+      console.log('[Mouse Gestures] Cleaning up gesture, had', this.gesturePoints.length, 'points');
       this.isDrawing = false;
 
       const gesture = this.recognizeGesture();
 
       if (gesture) {
         this.gestureDrawn = true;
+        this.suppressContextMenu = true; // Definitely suppress if gesture recognized
         this.executeGesture(gesture);
       }
 
@@ -77,10 +86,19 @@ class MouseGestureDetector {
   }
 
   handleContextMenu(e) {
-    // Prevent context menu if we've drawn a gesture
-    if (this.gestureDrawn) {
+    console.log('[Mouse Gestures] ContextMenu event - suppressContextMenu:', this.suppressContextMenu, 'gestureDrawn:', this.gestureDrawn);
+
+    // Prevent context menu if we moved while drawing or recognized a gesture
+    if (this.suppressContextMenu || this.gestureDrawn) {
+      console.log('[Mouse Gestures] Preventing context menu');
       e.preventDefault();
-      this.gestureDrawn = false; // Reset flag
+      e.stopPropagation();
+
+      // Reset flags after a short delay to ensure event is fully handled
+      setTimeout(() => {
+        this.gestureDrawn = false;
+        this.suppressContextMenu = false;
+      }, 100);
     }
   }
 

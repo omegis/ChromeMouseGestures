@@ -1,6 +1,6 @@
 /**
  * Mouse Gestures Extension - Content Script
- * Version: 1.1.4
+ * Version: 1.2.0
  * Last Update: 2025-10-07
  */
 
@@ -111,8 +111,23 @@ class MouseGestureDetector {
     console.log('[Mouse Gestures] Click duration:', clickDuration, 'ms, isShortClick:', isShortClick);
 
     if (isShortClick) {
-      console.log('[Mouse Gestures] Short click detected (< 500ms) - allowing context menu');
+      console.log('[Mouse Gestures] Short click detected - will manually trigger context menu');
       this.suppressContextMenu = false;
+
+      // Manually trigger context menu after a short delay
+      // This allows the original context menu event to be fully suppressed first
+      setTimeout(() => {
+        console.log('[Mouse Gestures] Manually triggering context menu at', e.clientX, e.clientY);
+        const contextMenuEvent = new MouseEvent('contextmenu', {
+          bubbles: true,
+          cancelable: true,
+          view: window,
+          button: 2,
+          clientX: e.clientX,
+          clientY: e.clientY
+        });
+        e.target.dispatchEvent(contextMenuEvent);
+      }, 50);
     } else {
       console.log('[Mouse Gestures] Long press or gesture - suppressing context menu');
       this.suppressContextMenu = true;
@@ -137,20 +152,23 @@ class MouseGestureDetector {
   handleContextMenu(e) {
     if (!this.isEnabled) return;
 
-    console.log('[Mouse Gestures] ContextMenu event - suppressContextMenu:', this.suppressContextMenu, 'gestureDrawn:', this.gestureDrawn);
+    console.log('[Mouse Gestures] ContextMenu event - suppressContextMenu:', this.suppressContextMenu, 'gestureDrawn:', this.gestureDrawn, 'isDrawing:', this.isDrawing);
 
-    // Prevent context menu if we're suppressing it or if gesture was drawn
-    if (this.suppressContextMenu || this.gestureDrawn) {
-      console.log('[Mouse Gestures] Preventing context menu');
+    // Always prevent the original context menu if we're tracking a gesture
+    // We'll manually trigger it later if it was a short click
+    if (this.isDrawing || this.suppressContextMenu || this.gestureDrawn) {
+      console.log('[Mouse Gestures] Preventing context menu (will manually trigger if short click)');
       e.preventDefault();
       e.stopPropagation();
       e.stopImmediatePropagation();
 
-      // Reset flags after a short delay to ensure event is fully handled
+      // Reset flags after a delay
       setTimeout(() => {
         this.gestureDrawn = false;
-        this.suppressContextMenu = false;
-      }, 100);
+        if (!this.isDrawing) {
+          this.suppressContextMenu = false;
+        }
+      }, 200);
 
       return false;
     }

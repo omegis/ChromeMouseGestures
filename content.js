@@ -1,6 +1,6 @@
 /**
  * Mouse Gestures Extension - Content Script
- * Version: 1.0.3
+ * Version: 1.0.4
  * Last Update: 2025-10-07
  */
 
@@ -38,8 +38,11 @@ class MouseGestureDetector {
   }
 
   handleMouseDown(e) {
+    console.log('[Mouse Gestures] MouseDown - button:', e.button, 'enabled:', this.isEnabled);
+
     if (!this.isEnabled || e.button !== 2) return; // Only right-click
 
+    console.log('[Mouse Gestures] Starting gesture drawing');
     this.isDrawing = true;
     this.gestureDrawn = false;
     this.gesturePoints = [{ x: e.clientX, y: e.clientY }];
@@ -54,18 +57,23 @@ class MouseGestureDetector {
   }
 
   handleMouseUp(e) {
-    if (!this.isDrawing || !this.isEnabled) return;
+    console.log('[Mouse Gestures] MouseUp - button:', e.button, 'isDrawing:', this.isDrawing, 'enabled:', this.isEnabled);
 
-    this.isDrawing = false;
-    const gesture = this.recognizeGesture();
+    // Always clean up if we were drawing, regardless of button
+    if (this.isDrawing) {
+      console.log('[Mouse Gestures] Cleaning up gesture');
+      this.isDrawing = false;
 
-    if (gesture) {
-      this.gestureDrawn = true;
-      this.executeGesture(gesture);
+      const gesture = this.recognizeGesture();
+
+      if (gesture) {
+        this.gestureDrawn = true;
+        this.executeGesture(gesture);
+      }
+
+      this.removeTrail();
+      this.gesturePoints = [];
     }
-
-    this.removeTrail();
-    this.gesturePoints = [];
   }
 
   handleContextMenu(e) {
@@ -113,8 +121,10 @@ class MouseGestureDetector {
   }
 
   removeTrail() {
+    console.log('[Mouse Gestures] Removing trail, exists:', !!this.trailSvg);
     if (this.trailSvg && this.trailSvg.parentNode) {
       this.trailSvg.parentNode.removeChild(this.trailSvg);
+      console.log('[Mouse Gestures] Trail removed from DOM');
     }
     this.trailSvg = null;
     this.trailPath = null;

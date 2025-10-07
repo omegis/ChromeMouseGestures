@@ -1,6 +1,6 @@
 /**
  * Mouse Gestures Extension - Content Script
- * Version: 1.0.6
+ * Version: 1.0.7
  * Last Update: 2025-10-07
  */
 
@@ -43,10 +43,10 @@ class MouseGestureDetector {
 
     if (!this.isEnabled || e.button !== 2) return; // Only right-click
 
-    console.log('[Mouse Gestures] Starting gesture drawing');
+    console.log('[Mouse Gestures] Starting gesture drawing - will suppress context menu');
     this.isDrawing = true;
     this.gestureDrawn = false;
-    this.suppressContextMenu = false; // Reset flag
+    this.suppressContextMenu = true; // ALWAYS suppress when gesture mode starts
     this.gesturePoints = [{ x: e.clientX, y: e.clientY }];
     this.createTrailSvg();
   }
@@ -56,12 +56,6 @@ class MouseGestureDetector {
 
     this.gesturePoints.push({ x: e.clientX, y: e.clientY });
     this.updateTrail();
-
-    // Suppress context menu on ANY movement
-    if (!this.suppressContextMenu) {
-      this.suppressContextMenu = true;
-      console.log('[Mouse Gestures] Movement detected, will suppress context menu');
-    }
   }
 
   handleMouseUp(e) {

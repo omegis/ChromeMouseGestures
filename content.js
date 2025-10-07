@@ -1,6 +1,6 @@
 /**
  * Mouse Gestures Extension - Content Script
- * Version: 1.0.5
+ * Version: 1.0.6
  * Last Update: 2025-10-07
  */
 
@@ -31,11 +31,11 @@ class MouseGestureDetector {
       }
     });
 
-    // Bind event listeners
-    document.addEventListener('mousedown', this.handleMouseDown.bind(this));
-    document.addEventListener('mousemove', this.handleMouseMove.bind(this));
-    document.addEventListener('mouseup', this.handleMouseUp.bind(this));
-    document.addEventListener('contextmenu', this.handleContextMenu.bind(this));
+    // Bind event listeners - use capture phase for mousedown and contextmenu
+    document.addEventListener('mousedown', this.handleMouseDown.bind(this), true);
+    document.addEventListener('mousemove', this.handleMouseMove.bind(this), false);
+    document.addEventListener('mouseup', this.handleMouseUp.bind(this), false);
+    document.addEventListener('contextmenu', this.handleContextMenu.bind(this), true);
   }
 
   handleMouseDown(e) {
@@ -57,8 +57,8 @@ class MouseGestureDetector {
     this.gesturePoints.push({ x: e.clientX, y: e.clientY });
     this.updateTrail();
 
-    // If we've moved while drawing, suppress context menu
-    if (this.gesturePoints.length > 3) {
+    // Suppress context menu on ANY movement
+    if (!this.suppressContextMenu) {
       this.suppressContextMenu = true;
       console.log('[Mouse Gestures] Movement detected, will suppress context menu');
     }
@@ -93,12 +93,15 @@ class MouseGestureDetector {
       console.log('[Mouse Gestures] Preventing context menu');
       e.preventDefault();
       e.stopPropagation();
+      e.stopImmediatePropagation();
 
       // Reset flags after a short delay to ensure event is fully handled
       setTimeout(() => {
         this.gestureDrawn = false;
         this.suppressContextMenu = false;
       }, 100);
+
+      return false;
     }
   }
 

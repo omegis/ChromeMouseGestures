@@ -1,6 +1,6 @@
 /**
  * Mouse Gestures Extension - Content Script
- * Version: 1.1.2
+ * Version: 1.1.3
  * Last Update: 2025-10-07
  */
 
@@ -52,7 +52,7 @@ class MouseGestureDetector {
     console.log('[Mouse Gestures] Starting gesture detection');
     this.isDrawing = true;
     this.gestureDrawn = false;
-    this.suppressContextMenu = false;
+    this.suppressContextMenu = true; // Suppress by default, will allow if short click
     this.inGestureMode = false; // Not in gesture mode yet
     this.gesturePoints = [{ x: e.clientX, y: e.clientY }];
     this.mouseDownTime = Date.now(); // Track when mouse was pressed

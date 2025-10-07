@@ -1,6 +1,6 @@
 /**
  * Mouse Gestures Extension - Content Script
- * Version: 1.0.7
+ * Version: 1.0.8
  * Last Update: 2025-10-07
  */
 
@@ -226,6 +226,9 @@ class MouseGestureDetector {
   executeGesture(gesture) {
     console.log('[Mouse Gestures] Executing gesture:', gesture);
 
+    // Show toast notification
+    this.showToast(gesture);
+
     // Send message to background script
     chrome.runtime.sendMessage({ action: gesture }, (response) => {
       if (chrome.runtime.lastError) {
@@ -234,6 +237,71 @@ class MouseGestureDetector {
         console.log('[Mouse Gestures] Response from background:', response);
       }
     });
+  }
+
+  showToast(gesture) {
+    // Map gesture names to display text
+    const gestureNames = {
+      'reload': 'Reload Page',
+      'close': 'Close Tab',
+      'nextTab': 'Next Tab',
+      'prevTab': 'Previous Tab'
+    };
+
+    const displayName = gestureNames[gesture] || gesture;
+
+    // Remove existing toast if any
+    const existingToast = document.getElementById('mouseGestureToast');
+    if (existingToast) {
+      existingToast.remove();
+    }
+
+    // Create toast element
+    const toast = document.createElement('div');
+    toast.id = 'mouseGestureToast';
+    toast.textContent = displayName;
+    toast.style.cssText = `
+      position: fixed;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      background: rgba(155, 89, 182, 0.95);
+      color: white;
+      padding: 16px 32px;
+      border-radius: 8px;
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      font-size: 18px;
+      font-weight: 600;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+      z-index: 2147483647;
+      pointer-events: none;
+      animation: fadeInOut 0.8s ease-in-out;
+    `;
+
+    // Add animation styles if not already present
+    if (!document.getElementById('mouseGestureToastStyles')) {
+      const style = document.createElement('style');
+      style.id = 'mouseGestureToastStyles';
+      style.textContent = `
+        @keyframes fadeInOut {
+          0% { opacity: 0; transform: translate(-50%, -50%) scale(0.8); }
+          20% { opacity: 1; transform: translate(-50%, -50%) scale(1); }
+          80% { opacity: 1; transform: translate(-50%, -50%) scale(1); }
+          100% { opacity: 0; transform: translate(-50%, -50%) scale(0.9); }
+        }
+      `;
+      document.head.appendChild(style);
+    }
+
+    // Append to body
+    (document.body || document.documentElement).appendChild(toast);
+
+    // Remove after animation completes
+    setTimeout(() => {
+      if (toast && toast.parentNode) {
+        toast.parentNode.removeChild(toast);
+      }
+    }, 800);
   }
 }
 

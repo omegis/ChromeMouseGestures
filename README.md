@@ -1,6 +1,6 @@
 # Mouse Gestures Browser Extension
 
-**Version:** 1.0.7
+**Version:** 1.0.8
 **Last Update:** 2025-10-07
 
 A simple and elegant mouse gesture extension for Brave and Chrome browsers with a purple gesture trail.
@@ -60,6 +60,13 @@ This extension follows:
 - Proper resource cleanup
 
 ## Version History
+
+### 1.0.8 (2025-10-07)
+- **NEW FEATURE**: Toast notification for executed commands
+- Shows command name in center of window when gesture is executed
+- Purple-themed toast with smooth fade animation
+- Displays: "Reload Page", "Close Tab", "Next Tab", "Previous Tab"
+- Auto-dismisses after 0.8 seconds
 
 ### 1.0.7 (2025-10-07)
 - **CRITICAL FIX**: Context menu now suppressed on long clicks without movement

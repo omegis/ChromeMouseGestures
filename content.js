@@ -1,6 +1,6 @@
 /**
  * Mouse Gestures Extension - Content Script
- * Version: 1.0.1
+ * Version: 1.0.2
  * Last Update: 2025-10-07
  */
 

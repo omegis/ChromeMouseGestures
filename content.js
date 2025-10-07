@@ -1,6 +1,6 @@
 /**
  * Mouse Gestures Extension - Content Script
- * Version: 1.0.0
+ * Version: 1.0.1
  * Last Update: 2025-10-07
  */
 
@@ -12,6 +12,7 @@ class MouseGestureDetector {
     this.trailSvg = null;
     this.trailPath = null;
     this.minDistance = 50; // Minimum distance to recognize a direction
+    this.gestureDrawn = false; // Track if gesture was drawn
 
     this.init();
   }
@@ -40,6 +41,7 @@ class MouseGestureDetector {
     if (!this.isEnabled || e.button !== 2) return; // Only right-click
 
     this.isDrawing = true;
+    this.gestureDrawn = false;
     this.gesturePoints = [{ x: e.clientX, y: e.clientY }];
     this.createTrailSvg();
   }
@@ -58,6 +60,7 @@ class MouseGestureDetector {
     const gesture = this.recognizeGesture();
 
     if (gesture) {
+      this.gestureDrawn = true;
       this.executeGesture(gesture);
     }
 
@@ -67,8 +70,9 @@ class MouseGestureDetector {
 
   handleContextMenu(e) {
     // Prevent context menu if we've drawn a gesture
-    if (this.gesturePoints.length > 5) {
+    if (this.gestureDrawn) {
       e.preventDefault();
+      this.gestureDrawn = false; // Reset flag
     }
   }
 
@@ -91,7 +95,10 @@ class MouseGestureDetector {
     this.trailPath.setAttribute('stroke-linejoin', 'round');
 
     this.trailSvg.appendChild(this.trailPath);
-    document.body.appendChild(this.trailSvg);
+
+    // Append to body or documentElement if body doesn't exist yet
+    const target = document.body || document.documentElement;
+    target.appendChild(this.trailSvg);
   }
 
   updateTrail() {
@@ -117,18 +124,25 @@ class MouseGestureDetector {
     if (this.gesturePoints.length < 2) return null;
 
     const directions = this.getDirections();
-    if (directions.length === 0) return null;
+    if (directions.length < 2) return null; // Need at least 2 directions
 
     const pattern = directions.join('-');
 
-    // Match gesture patterns
-    if (pattern.includes('up') && pattern.includes('down')) {
+    // Match gesture patterns - order matters!
+    // Reload: up then down (or down then up)
+    if ((pattern === 'up-down') || (pattern === 'down-up')) {
       return 'reload';
-    } else if (pattern.includes('down') && pattern.includes('right')) {
+    }
+    // Close: down then right
+    if (pattern === 'down-right' || pattern.startsWith('down-right')) {
       return 'close';
-    } else if (pattern.includes('up') && pattern.includes('right')) {
+    }
+    // Next tab: up then right
+    if (pattern === 'up-right' || pattern.startsWith('up-right')) {
       return 'nextTab';
-    } else if (pattern.includes('up') && pattern.includes('left')) {
+    }
+    // Previous tab: up then left
+    if (pattern === 'up-left' || pattern.startsWith('up-left')) {
       return 'prevTab';
     }
 
@@ -138,13 +152,14 @@ class MouseGestureDetector {
   getDirections() {
     const directions = [];
     let lastDirection = null;
+    let lastDirectionPoint = this.gesturePoints[0];
 
     for (let i = 1; i < this.gesturePoints.length; i++) {
-      const prev = this.gesturePoints[i - 1];
       const curr = this.gesturePoints[i];
 
-      const dx = curr.x - prev.x;
-      const dy = curr.y - prev.y;
+      // Calculate distance from last direction change point
+      const dx = curr.x - lastDirectionPoint.x;
+      const dy = curr.y - lastDirectionPoint.y;
       const distance = Math.sqrt(dx * dx + dy * dy);
 
       if (distance < this.minDistance) continue;
@@ -155,6 +170,7 @@ class MouseGestureDetector {
       if (direction && direction !== lastDirection) {
         directions.push(direction);
         lastDirection = direction;
+        lastDirectionPoint = curr; // Update reference point
       }
     }
 

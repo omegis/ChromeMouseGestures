@@ -1,6 +1,6 @@
 # Mouse Gestures Browser Extension
 
-**Version:** 1.0.0
+**Version:** 1.0.1
 **Last Update:** 2025-10-07
 
 A simple and elegant mouse gesture extension for Brave and Chrome browsers with a purple gesture trail.
@@ -60,6 +60,12 @@ This extension follows:
 - Proper resource cleanup
 
 ## Version History
+
+### 1.0.1 (2025-10-07)
+- Fixed context menu prevention logic
+- Fixed gesture pattern matching to be more precise
+- Fixed document.body null reference issue
+- Improved distance calculation for direction detection
 
 ### 1.0.0 (2025-10-07)
 - Initial release

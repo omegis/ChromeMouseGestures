@@ -1,6 +1,6 @@
 /**
  * Mouse Gestures Extension - Content Script
- * Version: 1.0.9
+ * Version: 1.1.0
  * Last Update: 2025-10-07
  */
 
@@ -48,12 +48,21 @@ class MouseGestureDetector {
 
     if (!this.isEnabled || e.button !== 2) return; // Only right-click
 
-    console.log('[Mouse Gestures] Starting gesture drawing - will suppress context menu');
+    console.log('[Mouse Gestures] Starting gesture detection');
     this.isDrawing = true;
     this.gestureDrawn = false;
-    this.suppressContextMenu = true; // ALWAYS suppress when gesture mode starts
+    this.suppressContextMenu = false; // Don't suppress yet - wait for movement
     this.gesturePoints = [{ x: e.clientX, y: e.clientY }];
+    this.mouseDownTime = Date.now(); // Track when mouse was pressed
     this.createTrailSvg();
+
+    // Set a timeout - if held for more than 200ms without movement, suppress menu
+    this.longPressTimer = setTimeout(() => {
+      if (this.isDrawing && this.gesturePoints.length <= 1) {
+        console.log('[Mouse Gestures] Long press detected - will suppress context menu');
+        this.suppressContextMenu = true;
+      }
+    }, 200);
   }
 
   handleMouseMove(e) {
@@ -61,14 +70,36 @@ class MouseGestureDetector {
 
     this.gesturePoints.push({ x: e.clientX, y: e.clientY });
     this.updateTrail();
+
+    // Suppress context menu on ANY movement - user is drawing a gesture
+    if (!this.suppressContextMenu) {
+      console.log('[Mouse Gestures] Movement detected - will suppress context menu');
+      this.suppressContextMenu = true;
+    }
   }
 
   handleMouseUp(e) {
     console.log('[Mouse Gestures] MouseUp - button:', e.button, 'isDrawing:', this.isDrawing, 'enabled:', this.isEnabled, 'points:', this.gesturePoints.length);
 
+    // Clear the long press timer
+    if (this.longPressTimer) {
+      clearTimeout(this.longPressTimer);
+      this.longPressTimer = null;
+    }
+
     // Always clean up if we were drawing, regardless of button
     if (this.isDrawing) {
       console.log('[Mouse Gestures] Cleaning up gesture, had', this.gesturePoints.length, 'points');
+
+      // Check if this was a quick click (< 200ms and no movement)
+      const clickDuration = Date.now() - this.mouseDownTime;
+      const isQuickClick = clickDuration < 200 && this.gesturePoints.length <= 1;
+
+      if (isQuickClick) {
+        console.log('[Mouse Gestures] Quick click detected - allowing context menu');
+        this.suppressContextMenu = false;
+      }
+
       this.isDrawing = false;
 
       const gesture = this.recognizeGesture();

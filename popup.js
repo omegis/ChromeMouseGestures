@@ -1,11 +1,11 @@
 /**
  * Mouse Gestures Extension - Popup Script
- * Version: 1.3.1
+ * Version: 1.4.0
  * Last Update: 2025-10-07
  */
 
 console.log('Mouse Gestures Extension - Popup');
-console.log('Version: 1.3.1');
+console.log('Version: 1.4.0');
 console.log('Last Update: 2025-10-07');
 
 const enableToggle = document.getElementById('enableToggle');

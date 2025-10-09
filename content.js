@@ -230,8 +230,8 @@ class MouseGestureDetector {
     const directions = this.getDirections();
     this.log('[Mouse Gestures] Detected directions:', directions);
 
-    if (directions.length < 2) {
-      this.log('[Mouse Gestures] Not enough directions, need at least 2');
+    if (directions.length === 0) {
+      this.log('[Mouse Gestures] No directions detected');
       return null;
     }
 
@@ -239,6 +239,11 @@ class MouseGestureDetector {
     this.log('[Mouse Gestures] Pattern:', pattern);
 
     // Match gesture patterns - order matters!
+    // Back: single left direction
+    if (pattern === 'left') {
+      this.log('[Mouse Gestures] Recognized: BACK');
+      return 'back';
+    }
     // Reload: up then down (or down then up)
     if ((pattern === 'up-down') || (pattern === 'down-up')) {
       this.log('[Mouse Gestures] Recognized: RELOAD');
@@ -325,6 +330,7 @@ class MouseGestureDetector {
   showToast(gesture) {
     // Map gesture names to display text
     const gestureNames = {
+      'back': 'Go Back',
       'reload': 'Reload Page',
       'close': 'Close Tab',
       'nextTab': 'Next Tab',

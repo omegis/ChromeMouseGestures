@@ -1,11 +1,11 @@
 /**
  * Mouse Gestures Extension - Background Service Worker
- * Version: 1.3.1
+ * Version: 1.4.0
  * Last Update: 2025-10-07
  */
 
 console.log('Mouse Gestures Extension - Background Service Worker Started');
-console.log('Version: 1.3.1');
+console.log('Version: 1.4.0');
 console.log('Last Update: 2025-10-07');
 
 // Listen for messages from content scripts
@@ -44,6 +44,11 @@ async function handleGestureAction(action, tab) {
   }
 
   switch (action) {
+    case 'back':
+      console.log('[Background] Going back in history');
+      await goBack(tab.id);
+      break;
+
     case 'reload':
       console.log('[Background] Reloading tab', tab.id);
       await reloadTab(tab.id);
@@ -67,6 +72,13 @@ async function handleGestureAction(action, tab) {
     default:
       throw new Error(`Unknown action: ${action}`);
   }
+}
+
+/**
+ * Go back in browser history
+ */
+async function goBack(tabId) {
+  await chrome.tabs.goBack(tabId);
 }
 
 /**

@@ -1,6 +1,6 @@
 # Mouse Gestures Browser Extension
 
-**Version:** 1.4.0
+**Version:** 1.4.1
 **Last Update:** 2025-10-07
 
 A simple and elegant mouse gesture extension for Brave and Chrome browsers with a purple gesture trail.
@@ -66,6 +66,15 @@ This extension follows:
 - Proper resource cleanup
 
 ## Version History
+
+### 1.4.1 (2025-10-07)
+- **CALIBRATION FIX**: Improved up-down gesture reliability
+- Reduced minDistance threshold from 50px to 30px (40% reduction)
+- Allows smaller, more natural gestures
+- Fixed strict pattern matching for up-down gesture
+- Now allows drift at end of gesture (e.g., "up-down-left" works)
+- Matches behavior of other gestures (close, next tab, prev tab)
+- Up-down gesture should now work consistently even with imprecise movements
 
 ### 1.4.0 (2025-10-07)
 - **NEW GESTURE**: Go Back - single line to the left

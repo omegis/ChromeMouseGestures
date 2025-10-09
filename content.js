@@ -1,6 +1,6 @@
 /**
  * Mouse Gestures Extension - Content Script
- * Version: 1.4.0
+ * Version: 1.4.1
  * Last Update: 2025-10-07
  */
 
@@ -12,7 +12,7 @@ class MouseGestureDetector {
     this.gesturePoints = [];
     this.trailSvg = null;
     this.trailPath = null;
-    this.minDistance = 50; // Minimum distance to recognize a direction
+    this.minDistance = 30; // Minimum distance to recognize a direction (reduced for better sensitivity)
     this.gestureDrawn = false; // Track if gesture was drawn
     this.inGestureMode = false; // Track if in gesture mode (long press or movement)
     this.lastRightClickTime = 0; // Track last right-click time for double-click detection
@@ -244,8 +244,9 @@ class MouseGestureDetector {
       this.log('[Mouse Gestures] Recognized: BACK');
       return 'back';
     }
-    // Reload: up then down (or down then up)
-    if ((pattern === 'up-down') || (pattern === 'down-up')) {
+    // Reload: up then down (or down then up) - allow drift at end
+    if (pattern === 'up-down' || pattern.startsWith('up-down') ||
+        pattern === 'down-up' || pattern.startsWith('down-up')) {
       this.log('[Mouse Gestures] Recognized: RELOAD');
       return 'reload';
     }

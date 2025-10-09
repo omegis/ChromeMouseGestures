@@ -1,6 +1,6 @@
 /**
  * Mouse Gestures Extension - Content Script
- * Version: 1.4.1
+ * Version: 1.5.0
  * Last Update: 2025-10-07
  */
 
@@ -244,6 +244,11 @@ class MouseGestureDetector {
       this.log('[Mouse Gestures] Recognized: BACK');
       return 'back';
     }
+    // Forward: single right direction
+    if (pattern === 'right') {
+      this.log('[Mouse Gestures] Recognized: FORWARD');
+      return 'forward';
+    }
     // Reload: up then down (or down then up) - allow drift at end
     if (pattern === 'up-down' || pattern.startsWith('up-down') ||
         pattern === 'down-up' || pattern.startsWith('down-up')) {
@@ -332,6 +337,7 @@ class MouseGestureDetector {
     // Map gesture names to display text
     const gestureNames = {
       'back': 'Go Back',
+      'forward': 'Go Forward',
       'reload': 'Reload Page',
       'close': 'Close Tab',
       'nextTab': 'Next Tab',

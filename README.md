@@ -1,6 +1,6 @@
 # Mouse Gestures Browser Extension
 
-**Version:** 1.4.1
+**Version:** 1.5.0
 **Last Update:** 2025-10-07
 
 A simple and elegant mouse gesture extension for Brave and Chrome browsers with a purple gesture trail.
@@ -9,7 +9,7 @@ A simple and elegant mouse gesture extension for Brave and Chrome browsers with 
 
 ## Features
 
-- 🖱️ **5 Essential Gestures** - Quick navigation with simple mouse movements
+- 🖱️ **6 Essential Gestures** - Quick navigation with simple mouse movements
 - 🟣 **Purple Visual Trail** - See your gestures in real-time with a beautiful purple trail
 - ⚡ **Lightweight** - Minimal resource usage
 - 🎯 **Simple Toggle** - Easy enable/disable from toolbar
@@ -19,6 +19,7 @@ A simple and elegant mouse gesture extension for Brave and Chrome browsers with 
 | Gesture | Direction | Action |
 |---------|-----------|--------|
 | Go Back | ← (Left) | Go back in browser history |
+| Go Forward | → (Right) | Go forward in browser history |
 | Reload Page | ↑ ↓ (Up-Down) | Reload current page |
 | Close Tab | ↓ → (Down-Right) | Close current tab |
 | Next Tab | ↑ → (Up-Right) | Switch to next tab |
@@ -66,6 +67,16 @@ This extension follows:
 - Proper resource cleanup
 
 ## Version History
+
+### 1.5.0 (2025-10-07)
+- **NEW GESTURE**: Go Forward - single line to the right
+- Added browser history forward navigation (→ gesture)
+- Uses chrome.tabs.goForward API
+- Complements the back gesture (← / →)
+- Simple single-direction gesture for common action
+- Updated popup UI to show new gesture
+- Updated documentation with forward gesture
+- Now supports 6 gestures total
 
 ### 1.4.1 (2025-10-07)
 - **CALIBRATION FIX**: Improved up-down gesture reliability

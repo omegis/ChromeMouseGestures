@@ -111,7 +111,7 @@ If we make any changes to how the extension handles data in the future, we will:
 
 The extension's source code is available on GitHub for full transparency. You can review the code to verify our privacy claims:
 
-**GitHub Repository:** https://github.com/[your-username]/MouseGestures
+**GitHub Repository:** https://github.com/omegis/ChromeMouseGestures
 
 ---
 
@@ -119,8 +119,8 @@ The extension's source code is available on GitHub for full transparency. You ca
 
 If you have questions about this privacy policy or the extension:
 
-- **GitHub Issues:** https://github.com/[your-username]/MouseGestures/issues
-- **Email:** [your-email]
+- **GitHub Issues:** https://github.com/omegis/ChromeMouseGestures/issues
+- **GitHub Repository:** https://github.com/omegis/ChromeMouseGestures
 
 ---
 

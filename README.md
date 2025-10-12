@@ -1,7 +1,7 @@
 # Mouse Gestures Browser Extension
 
-**Version:** 1.5.0
-**Last Update:** 2025-10-07
+**Version:** 1.6.0
+**Last Update:** 2025-10-12
 
 A simple and elegant mouse gesture extension for Brave and Chrome browsers with a purple gesture trail.
 
@@ -27,6 +27,10 @@ A simple and elegant mouse gesture extension for Brave and Chrome browsers with 
 
 ## Installation
 
+### From Chrome Web Store (Coming Soon)
+*Extension will be available on Chrome Web Store soon*
+
+### Manual Installation (Developer Mode)
 1. Clone or download this repository
 2. Open Brave/Chrome and navigate to `brave://extensions` or `chrome://extensions`
 3. Enable "Developer mode" (toggle in top right corner)
@@ -67,6 +71,16 @@ This extension follows:
 - Proper resource cleanup
 
 ## Version History
+
+### 1.6.0 (2025-10-12)
+- **PUBLICATION READY**: Prepared extension for Chrome Web Store
+- Added required icons (16x16, 48x48, 128x128) for Chrome Web Store
+- Added icons field to manifest.json
+- Created comprehensive privacy policy (PRIVACY.md)
+- Created screenshot guide for store listing (SCREENSHOTS_GUIDE.md)
+- Added publication instructions to README
+- Created distribution ZIP package (mouse-gestures-v1.6.0.zip)
+- All files ready for Chrome Web Store submission
 
 ### 1.5.0 (2025-10-07)
 - **NEW GESTURE**: Go Forward - single line to the right
@@ -236,6 +250,90 @@ This extension follows:
 - Purple gesture trail
 - Enable/disable toggle
 - Manifest V3 support
+
+## Publishing to Chrome Web Store
+
+### Prerequisites
+- Google Chrome Developer account ($5 one-time fee)
+- High-quality screenshots (see `SCREENSHOTS_GUIDE.md`)
+
+### Publication Steps
+
+1. **Create ZIP Package**
+   ```bash
+   # From project root
+   zip -r mouse-gestures-v1.6.0.zip . -x "*.git*" "*.DS_Store" "SCREENSHOTS_GUIDE.md" "*.md"
+   ```
+
+2. **Chrome Web Store Developer Dashboard**
+   - Visit: https://chrome.google.com/webstore/devconsole
+   - Click "New Item"
+   - Upload `mouse-gestures-v1.5.0.zip`
+
+3. **Store Listing Information**
+   - **Name:** Mouse Gestures
+   - **Summary:** Simple mouse gesture extension with purple trail - reload, close, and navigate tabs
+   - **Category:** Productivity
+   - **Language:** English
+
+4. **Detailed Description**
+   ```
+   Navigate your browser faster with elegant mouse gestures!
+
+   🖱️ 6 ESSENTIAL GESTURES
+   Simply hold right-click and draw:
+   • ← Left: Go back in history
+   • → Right: Go forward in history
+   • ↑↓ Up-Down: Reload page
+   • ↓→ Down-Right: Close tab
+   • ↑→ Up-Right: Next tab
+   • ↑← Up-Left: Previous tab
+
+   🟣 BEAUTIFUL PURPLE TRAIL
+   See your gestures in real-time with a smooth purple trail
+
+   ⚡ LIGHTWEIGHT & FAST
+   Minimal resource usage, maximum productivity
+
+   🎯 EASY TOGGLE
+   Enable/disable gestures with one click
+
+   🔒 PRIVACY FIRST
+   No data collection, no tracking, completely local
+
+   CONTEXT MENU ACCESS
+   Double right-click to access your normal context menu
+   ```
+
+5. **Screenshots**
+   - Upload 3-5 screenshots (see `SCREENSHOTS_GUIDE.md`)
+   - Recommended size: 1280x800 pixels
+
+6. **Privacy**
+   - **Privacy Policy URL:** [Your hosted PRIVACY.md URL]
+   - Or copy content from `PRIVACY.md` to store listing
+
+7. **Justification for Permissions**
+   - **tabs:** Execute tab operations (reload, close, switch, navigate)
+   - **storage:** Save user preferences locally
+   - **activeTab:** Detect mouse gestures on current tab
+
+8. **Submit for Review**
+   - Review all information
+   - Click "Submit for Review"
+   - Typical review time: 1-3 business days
+
+### Post-Publication
+
+- Monitor reviews and respond to user feedback
+- Update version in manifest.json for future releases
+- Follow semantic versioning (major.minor.patch)
+
+## Privacy Policy
+
+See [PRIVACY.md](PRIVACY.md) for complete privacy policy.
+
+**Summary:** This extension does not collect, store, or transmit any user data. All operations are performed locally in your browser.
 
 ## License
 

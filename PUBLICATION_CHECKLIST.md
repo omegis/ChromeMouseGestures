@@ -149,7 +149,12 @@ GitHub: https://github.com/omegis/ChromeMouseGestures
 
 ### Privacy Policy
 
-**Option 1 - URL (Recommended):**
+**Option 1 - GitHub Pages URL (Recommended):**
+```
+https://omegis.github.io/ChromeMouseGestures/PRIVACY.md
+```
+
+**Option 2 - GitHub Blob URL (Alternative):**
 ```
 https://github.com/omegis/ChromeMouseGestures/blob/main/PRIVACY.md
 ```

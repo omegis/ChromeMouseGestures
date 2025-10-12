@@ -310,8 +310,8 @@ This extension follows:
    - Recommended size: 1280x800 pixels
 
 6. **Privacy**
-   - **Privacy Policy URL:** [Your hosted PRIVACY.md URL]
-   - Or copy content from `PRIVACY.md` to store listing
+   - **Privacy Policy URL:** https://omegis.github.io/ChromeMouseGestures/PRIVACY.md
+   - Alternative: Copy content from `PRIVACY.md` to store listing
 
 7. **Justification for Permissions**
    - **tabs:** Execute tab operations (reload, close, switch, navigate)

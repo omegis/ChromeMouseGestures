@@ -1,7 +1,7 @@
-# Mouse Gestures Browser Extension
+# Simple Mouse Gestures Browser Extension
 
-**Version:** 1.6.0
-**Last Update:** 2025-10-12
+**Version:** 1.6.1
+**Last Update:** 2025-10-22
 
 A simple and elegant mouse gesture extension for Brave and Chrome browsers with a purple gesture trail.
 
@@ -56,7 +56,7 @@ Click the extension icon in your toolbar to toggle gestures on/off.
 ## Technical Details
 
 - **Manifest Version:** 3
-- **Permissions:** tabs, storage, activeTab
+- **Permissions:** storage, activeTab
 - **Architecture:**
   - `content.js` - Gesture detection and visualization
   - `background.js` - Tab operations handler
@@ -71,6 +71,14 @@ This extension follows:
 - Proper resource cleanup
 
 ## Version History
+
+### 1.6.1 (2025-10-22)
+- **CHROME WEB STORE FIX**: Removed unnecessary "tabs" permission
+- Fixed Chrome Web Store submission violation (Purple Potassium)
+- Verified all tab operations work with only "activeTab" permission
+- Removed "tabs" from manifest.json permissions array
+- Renamed extension to "Simple Mouse Gestures"
+- All features continue to work as expected
 
 ### 1.6.0 (2025-10-12)
 - **PUBLICATION READY**: Prepared extension for Chrome Web Store
@@ -271,7 +279,7 @@ This extension follows:
    - Upload `mouse-gestures-v1.5.0.zip`
 
 3. **Store Listing Information**
-   - **Name:** Mouse Gestures
+   - **Name:** Simple Mouse Gestures
    - **Summary:** Simple mouse gesture extension with purple trail - reload, close, and navigate tabs
    - **Category:** Productivity
    - **Language:** English
@@ -314,9 +322,8 @@ This extension follows:
    - Alternative: Copy content from `PRIVACY.md` to store listing
 
 7. **Justification for Permissions**
-   - **tabs:** Execute tab operations (reload, close, switch, navigate)
    - **storage:** Save user preferences locally
-   - **activeTab:** Detect mouse gestures on current tab
+   - **activeTab:** Detect mouse gestures on current tab and execute tab operations (reload, close, switch, navigate)
 
 8. **Submit for Review**
    - Review all information

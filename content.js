@@ -1,7 +1,7 @@
 /**
- * Mouse Gestures Extension - Content Script
- * Version: 1.6.0
- * Last Update: 2025-10-12
+ * Simple Mouse Gestures Extension - Content Script
+ * Version: 1.6.1
+ * Last Update: 2025-10-22
  */
 
 class MouseGestureDetector {

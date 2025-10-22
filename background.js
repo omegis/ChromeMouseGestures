@@ -1,12 +1,12 @@
 /**
- * Mouse Gestures Extension - Background Service Worker
- * Version: 1.6.0
- * Last Update: 2025-10-12
+ * Simple Mouse Gestures Extension - Background Service Worker
+ * Version: 1.6.1
+ * Last Update: 2025-10-22
  */
 
-console.log('Mouse Gestures Extension - Background Service Worker Started');
-console.log('Version: 1.6.0');
-console.log('Last Update: 2025-10-12');
+console.log('Simple Mouse Gestures Extension - Background Service Worker Started');
+console.log('Version: 1.6.1');
+console.log('Last Update: 2025-10-22');
 
 // Listen for messages from content scripts
 chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {

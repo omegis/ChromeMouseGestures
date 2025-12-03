@@ -1,6 +1,6 @@
 # Simple Mouse Gestures Browser Extension
 
-**Version:** 1.7.2
+**Version:** 1.7.3
 **Last Update:** 2025-12-03
 
 A simple and elegant mouse gesture extension for Brave and Chrome browsers with a purple gesture trail.
@@ -71,6 +71,12 @@ This extension follows:
 - Proper resource cleanup
 
 ## Version History
+
+### 1.7.3 (2025-12-03)
+- **FIX**: Lowered movement threshold from 15px to 5px for more responsive gesture activation
+- Gestures now activate almost immediately when moving the mouse
+- Based on research: industry standard is 5-10 pixels for gesture start detection
+- Sources: MooseGesture (60px for direction), Gesturefy (5-10px for start), CrxMouse (configurable)
 
 ### 1.7.2 (2025-12-03)
 - **FIX**: Gesture mode no longer activates when context menu is open

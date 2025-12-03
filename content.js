@@ -1,6 +1,6 @@
 /**
  * Simple Mouse Gestures Extension - Content Script
- * Version: 1.7.2
+ * Version: 1.7.3
  * Last Update: 2025-12-03
  */
 
@@ -17,7 +17,7 @@ class MouseGestureDetector {
     this.inGestureMode = false; // Track if in gesture mode (long press or movement)
     this.gestureTimeoutTimer = null; // Timer for max gesture duration
     this.maxGestureDuration = 3000; // 3 seconds max gesture duration
-    this.movementThreshold = 15; // Minimum pixels before gesture mode activates
+    this.movementThreshold = 5; // Minimum pixels before gesture mode activates (very responsive)
 
     this.init();
   }

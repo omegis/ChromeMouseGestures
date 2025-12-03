@@ -1,6 +1,6 @@
 /**
  * Simple Mouse Gestures Extension - Content Script
- * Version: 1.7.6
+ * Version: 1.7.7
  * Last Update: 2025-12-03
  */
 
@@ -309,8 +309,9 @@ class MouseGestureDetector {
       this.log('[Mouse Gestures] Recognized: FORWARD');
       return 'forward';
     }
-    // Reload: up then down (or down then up) - STRICT match only
-    if (pattern === 'up-down' || pattern === 'down-up') {
+    // Reload: up then down (or down then up) - LOOSE match, allow drift
+    if (pattern.includes('up-down') || pattern.includes('down-up') ||
+        pattern === 'up' || pattern === 'down') {
       this.log('[Mouse Gestures] Recognized: RELOAD');
       return 'reload';
     }

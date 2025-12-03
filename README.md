@@ -1,6 +1,6 @@
 # Simple Mouse Gestures Browser Extension
 
-**Version:** 1.7.6
+**Version:** 1.7.7
 **Last Update:** 2025-12-03
 
 A simple and elegant mouse gesture extension for Brave and Chrome browsers with a purple gesture trail.
@@ -72,11 +72,13 @@ This extension follows:
 
 ## Version History
 
+### 1.7.7 (2025-12-03)
+- **FIX**: Reload gesture now uses LOOSE pattern matching for easier triggering
+- Matches: `up`, `down`, or any pattern containing `up-down` or `down-up`
+- Much more forgiving - works on first try without needing perfect precision
+
 ### 1.7.6 (2025-12-03)
-- **FIX**: Reload gesture now requires STRICT pattern match
-- Only exact `up-down` or `down-up` patterns trigger reload
-- Previously allowed drift at end (e.g., `up-down-left` would also trigger)
-- This prevents accidental reload when drawing other gestures
+- Reload gesture strict match (reverted in 1.7.7)
 
 ### 1.7.5 (2025-12-03)
 - **REVERT**: Back to double right-click for context menu (like crxMouse)

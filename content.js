@@ -1,6 +1,6 @@
 /**
  * Simple Mouse Gestures Extension - Content Script
- * Version: 1.7.3
+ * Version: 1.7.4
  * Last Update: 2025-12-03
  */
 
@@ -18,6 +18,7 @@ class MouseGestureDetector {
     this.gestureTimeoutTimer = null; // Timer for max gesture duration
     this.maxGestureDuration = 3000; // 3 seconds max gesture duration
     this.movementThreshold = 5; // Minimum pixels before gesture mode activates (very responsive)
+    this.pendingContextMenuEvent = null; // Track pending context menu coordinates
 
     this.init();
   }
@@ -67,6 +68,7 @@ class MouseGestureDetector {
     this.isDrawing = true;
     this.gestureDrawn = false;
     this.inGestureMode = false; // Not in gesture mode yet
+    this.pendingContextMenuEvent = null;
     this.gesturePoints = [{ x: e.clientX, y: e.clientY }];
     this.mouseDownTime = Date.now(); // Track when mouse was pressed
 
@@ -106,7 +108,6 @@ class MouseGestureDetector {
       if (distanceFromStart >= this.movementThreshold) {
         this.log('[Mouse Gestures] Movement threshold reached - entering gesture mode');
         this.inGestureMode = true;
-        this.suppressContextMenu = true;
         // Create trail if not already created
         if (!this.trailSvg) {
           this.createTrailSvg();
@@ -149,17 +150,44 @@ class MouseGestureDetector {
         this.executeGesture(gesture);
       }
     } else {
-      this.log('[Mouse Gestures] NOT in gesture mode - allowing context menu naturally');
-      // Short click - let the natural contextmenu event fire
-      // Don't suppress it
+      this.log('[Mouse Gestures] NOT in gesture mode - showing context menu');
+      // No gesture was made, trigger context menu manually
+      if (this.pendingContextMenuEvent) {
+        this.showContextMenu(e.clientX, e.clientY);
+      }
     }
 
     this.isDrawing = false;
     this.inGestureMode = false;
-    this.suppressContextMenu = false;
+    this.pendingContextMenuEvent = null;
 
     this.removeTrail();
     this.gesturePoints = [];
+  }
+
+  showContextMenu(x, y) {
+    this.log('[Mouse Gestures] Triggering context menu at', x, y);
+
+    // Temporarily disable our extension to allow context menu
+    this.isEnabled = false;
+
+    // Create and dispatch a contextmenu event
+    const event = new MouseEvent('contextmenu', {
+      bubbles: true,
+      cancelable: true,
+      clientX: x,
+      clientY: y,
+      button: 2
+    });
+
+    // Find element at coordinates and dispatch
+    const element = document.elementFromPoint(x, y) || document.body;
+    element.dispatchEvent(event);
+
+    // Re-enable extension after a short delay
+    setTimeout(() => {
+      this.isEnabled = true;
+    }, 100);
   }
 
   cancelGesture() {
@@ -178,8 +206,8 @@ class MouseGestureDetector {
     // Reset state
     this.isDrawing = false;
     this.inGestureMode = false;
-    this.suppressContextMenu = false;
     this.gestureDrawn = false;
+    this.pendingContextMenuEvent = null;
 
     // Remove trail
     this.removeTrail();
@@ -193,46 +221,28 @@ class MouseGestureDetector {
 
     this.log('[Mouse Gestures] ContextMenu event - inGestureMode:', this.inGestureMode, 'gestureDrawn:', this.gestureDrawn);
 
-    // Allow context menu if not in gesture mode and no gesture was drawn
-    // This means: normal right-click without movement shows context menu naturally
-    if (!this.inGestureMode && !this.gestureDrawn) {
-      this.log('[Mouse Gestures] Allowing context menu - no gesture detected');
-      // Cancel gesture detection since menu is opening
-      this.cancelGestureDetection();
-      return; // Let the menu show naturally
+    // If already in gesture mode or gesture was drawn, suppress menu
+    if (this.inGestureMode || this.gestureDrawn) {
+      this.log('[Mouse Gestures] Suppressing context menu - gesture active');
+      e.preventDefault();
+      e.stopPropagation();
+      e.stopImmediatePropagation();
+
+      setTimeout(() => {
+        this.gestureDrawn = false;
+      }, 100);
+
+      return false;
     }
 
-    // Suppress context menu only if in gesture mode or gesture was drawn
-    this.log('[Mouse Gestures] Suppressing context menu - gesture mode active');
+    // Not in gesture mode yet - suppress now but check shortly if we should show menu
+    // Save event coordinates for potential menu trigger
+    this.log('[Mouse Gestures] Suppressing context menu - will check for gesture');
+    this.pendingContextMenuEvent = { x: e.clientX, y: e.clientY };
     e.preventDefault();
     e.stopPropagation();
     e.stopImmediatePropagation();
-
-    // Reset gestureDrawn flag after a delay
-    setTimeout(() => {
-      this.gestureDrawn = false;
-    }, 100);
-
     return false;
-  }
-
-  cancelGestureDetection() {
-    this.log('[Mouse Gestures] Canceling gesture detection (menu opened)');
-
-    // Clear timers
-    if (this.longPressTimer) {
-      clearTimeout(this.longPressTimer);
-      this.longPressTimer = null;
-    }
-    if (this.gestureTimeoutTimer) {
-      clearTimeout(this.gestureTimeoutTimer);
-      this.gestureTimeoutTimer = null;
-    }
-
-    // Reset state - but don't remove trail (there shouldn't be one)
-    this.isDrawing = false;
-    this.inGestureMode = false;
-    this.gesturePoints = [];
   }
 
   createTrailSvg() {

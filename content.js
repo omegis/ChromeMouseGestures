@@ -1,6 +1,6 @@
 /**
  * Simple Mouse Gestures Extension - Content Script
- * Version: 1.7.0
+ * Version: 1.7.1
  * Last Update: 2025-12-03
  */
 
@@ -15,9 +15,6 @@ class MouseGestureDetector {
     this.minDistance = 30; // Minimum distance to recognize a direction (reduced for better sensitivity)
     this.gestureDrawn = false; // Track if gesture was drawn
     this.inGestureMode = false; // Track if in gesture mode (long press or movement)
-    this.lastRightClickTime = 0; // Track last right-click time for double-click detection
-    this.doubleClickTimeout = 300; // Max time between clicks for double-click (ms)
-    this.allowContextMenu = false; // Flag to allow context menu on double-click
     this.gestureTimeoutTimer = null; // Timer for max gesture duration
     this.maxGestureDuration = 3000; // 3 seconds max gesture duration
     this.movementThreshold = 15; // Minimum pixels before gesture mode activates
@@ -66,23 +63,10 @@ class MouseGestureDetector {
 
     if (!this.isEnabled || e.button !== 2) return; // Only right-click
 
-    const now = Date.now();
-    const timeSinceLastClick = now - this.lastRightClickTime;
-
-    // Check for double right-click
-    if (timeSinceLastClick < this.doubleClickTimeout) {
-      this.log('[Mouse Gestures] Double right-click detected - will show context menu');
-      this.allowContextMenu = true;
-      this.lastRightClickTime = 0; // Reset to prevent triple-click from being detected as double
-      return; // Don't start gesture detection
-    }
-
     this.log('[Mouse Gestures] Starting gesture detection');
-    this.lastRightClickTime = now;
     this.isDrawing = true;
     this.gestureDrawn = false;
     this.inGestureMode = false; // Not in gesture mode yet
-    this.allowContextMenu = false;
     this.gesturePoints = [{ x: e.clientX, y: e.clientY }];
     this.mouseDownTime = Date.now(); // Track when mouse was pressed
 
@@ -209,16 +193,15 @@ class MouseGestureDetector {
 
     this.log('[Mouse Gestures] ContextMenu event - allowContextMenu:', this.allowContextMenu, 'inGestureMode:', this.inGestureMode, 'gestureDrawn:', this.gestureDrawn);
 
-    // Allow context menu on double right-click
-    if (this.allowContextMenu) {
-      this.log('[Mouse Gestures] Allowing context menu - double right-click detected');
-      this.allowContextMenu = false; // Reset flag
-      return; // Let the menu show
+    // Allow context menu if not in gesture mode and no gesture was drawn
+    // This means: normal right-click without movement shows context menu naturally
+    if (!this.inGestureMode && !this.gestureDrawn) {
+      this.log('[Mouse Gestures] Allowing context menu - no gesture detected');
+      return; // Let the menu show naturally
     }
 
-    // Suppress context menu if we're in gesture mode or gesture was drawn
-    // This includes single clicks, long press, and gestures
-    this.log('[Mouse Gestures] Suppressing context menu - gesture detection active');
+    // Suppress context menu only if in gesture mode or gesture was drawn
+    this.log('[Mouse Gestures] Suppressing context menu - gesture mode active');
     e.preventDefault();
     e.stopPropagation();
     e.stopImmediatePropagation();

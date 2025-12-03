@@ -1,11 +1,11 @@
 # Simple Mouse Gestures Browser Extension
 
-**Version:** 1.7.0
+**Version:** 1.7.1
 **Last Update:** 2025-12-03
 
 A simple and elegant mouse gesture extension for Brave and Chrome browsers with a purple gesture trail.
 
-**How to access context menu:** Double right-click!
+**Context menu works naturally!** Just right-click without moving. Gestures only activate when you move the mouse.
 
 ## Features
 
@@ -46,8 +46,8 @@ A simple and elegant mouse gesture extension for Brave and Chrome browsers with 
 4. The action will be executed
 
 **Context Menu:**
-- **Double right-click** to show the context menu
-- Single right-click will suppress the menu (gesture mode active)
+- **Right-click without moving** shows context menu naturally
+- Context menu only suppressed when you move the mouse (drawing gestures)
 
 ## Enable/Disable
 
@@ -71,6 +71,13 @@ This extension follows:
 - Proper resource cleanup
 
 ## Version History
+
+### 1.7.1 (2025-12-03)
+- **NATURAL RIGHT-CLICK**: Context menu now works naturally without double-click
+- Right-click without movement → shows context menu (like normal browser behavior)
+- Right-click with movement (>15px) → gesture mode activates, menu suppressed
+- Removed double-click requirement - much more intuitive experience
+- Cleaned up unused double-click detection code
 
 ### 1.7.0 (2025-12-03)
 - **FIX**: Trail not stopping on sites requiring right-click (Google Maps, ManyChat, etc.)

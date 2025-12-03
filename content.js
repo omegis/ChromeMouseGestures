@@ -1,6 +1,6 @@
 /**
  * Simple Mouse Gestures Extension - Content Script
- * Version: 1.7.1
+ * Version: 1.7.2
  * Last Update: 2025-12-03
  */
 
@@ -191,12 +191,14 @@ class MouseGestureDetector {
   handleContextMenu(e) {
     if (!this.isEnabled) return;
 
-    this.log('[Mouse Gestures] ContextMenu event - allowContextMenu:', this.allowContextMenu, 'inGestureMode:', this.inGestureMode, 'gestureDrawn:', this.gestureDrawn);
+    this.log('[Mouse Gestures] ContextMenu event - inGestureMode:', this.inGestureMode, 'gestureDrawn:', this.gestureDrawn);
 
     // Allow context menu if not in gesture mode and no gesture was drawn
     // This means: normal right-click without movement shows context menu naturally
     if (!this.inGestureMode && !this.gestureDrawn) {
       this.log('[Mouse Gestures] Allowing context menu - no gesture detected');
+      // Cancel gesture detection since menu is opening
+      this.cancelGestureDetection();
       return; // Let the menu show naturally
     }
 
@@ -212,6 +214,25 @@ class MouseGestureDetector {
     }, 100);
 
     return false;
+  }
+
+  cancelGestureDetection() {
+    this.log('[Mouse Gestures] Canceling gesture detection (menu opened)');
+
+    // Clear timers
+    if (this.longPressTimer) {
+      clearTimeout(this.longPressTimer);
+      this.longPressTimer = null;
+    }
+    if (this.gestureTimeoutTimer) {
+      clearTimeout(this.gestureTimeoutTimer);
+      this.gestureTimeoutTimer = null;
+    }
+
+    // Reset state - but don't remove trail (there shouldn't be one)
+    this.isDrawing = false;
+    this.inGestureMode = false;
+    this.gesturePoints = [];
   }
 
   createTrailSvg() {

@@ -1,6 +1,6 @@
 # Simple Mouse Gestures Browser Extension
 
-**Version:** 1.7.1
+**Version:** 1.7.2
 **Last Update:** 2025-12-03
 
 A simple and elegant mouse gesture extension for Brave and Chrome browsers with a purple gesture trail.
@@ -71,6 +71,12 @@ This extension follows:
 - Proper resource cleanup
 
 ## Version History
+
+### 1.7.2 (2025-12-03)
+- **FIX**: Gesture mode no longer activates when context menu is open
+- When context menu opens, gesture detection is cancelled immediately
+- Moving mouse while context menu is visible won't trigger gestures
+- Added `cancelGestureDetection()` method to cleanly stop detection when menu opens
 
 ### 1.7.1 (2025-12-03)
 - **NATURAL RIGHT-CLICK**: Context menu now works naturally without double-click

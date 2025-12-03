@@ -1,7 +1,7 @@
 # Simple Mouse Gestures Browser Extension
 
-**Version:** 1.6.1
-**Last Update:** 2025-10-22
+**Version:** 1.7.0
+**Last Update:** 2025-12-03
 
 A simple and elegant mouse gesture extension for Brave and Chrome browsers with a purple gesture trail.
 
@@ -71,6 +71,18 @@ This extension follows:
 - Proper resource cleanup
 
 ## Version History
+
+### 1.7.0 (2025-12-03)
+- **FIX**: Trail not stopping on sites requiring right-click (Google Maps, ManyChat, etc.)
+- **NEW**: Added 15px movement threshold before gesture mode activates
+- Small accidental movements during right-click no longer trigger gestures
+- Native context menus now work properly on sites that need them
+- **NEW**: Maximum gesture duration of 3 seconds
+- Gestures that run longer than 3 seconds are automatically cancelled (silent cancel)
+- Added `cancelGesture()` method for clean gesture abortion
+- Added `movementThreshold` (15px) and `maxGestureDuration` (3000ms) configuration
+- Trail only appears after moving 15+ pixels from click start point
+- Improved compatibility with sites that use right-click functionality
 
 ### 1.6.1 (2025-10-22)
 - **CHROME WEB STORE FIX**: Removed unnecessary "tabs" permission

@@ -1,7 +1,7 @@
 /**
  * Simple Mouse Gestures Extension - Content Script
- * Version: 1.6.1
- * Last Update: 2025-10-22
+ * Version: 1.7.0
+ * Last Update: 2025-12-03
  */
 
 class MouseGestureDetector {
@@ -18,6 +18,9 @@ class MouseGestureDetector {
     this.lastRightClickTime = 0; // Track last right-click time for double-click detection
     this.doubleClickTimeout = 300; // Max time between clicks for double-click (ms)
     this.allowContextMenu = false; // Flag to allow context menu on double-click
+    this.gestureTimeoutTimer = null; // Timer for max gesture duration
+    this.maxGestureDuration = 3000; // 3 seconds max gesture duration
+    this.movementThreshold = 15; // Minimum pixels before gesture mode activates
 
     this.init();
   }
@@ -94,6 +97,14 @@ class MouseGestureDetector {
         }
       }
     }, 500);
+
+    // Set a timeout - max gesture duration is 3 seconds
+    this.gestureTimeoutTimer = setTimeout(() => {
+      if (this.isDrawing) {
+        this.log('[Mouse Gestures] Gesture timeout (3s) - canceling gesture');
+        this.cancelGesture();
+      }
+    }, this.maxGestureDuration);
   }
 
   handleMouseMove(e) {
@@ -101,18 +112,28 @@ class MouseGestureDetector {
 
     this.gesturePoints.push({ x: e.clientX, y: e.clientY });
 
-    // Enter gesture mode on any movement
+    // Only enter gesture mode if moved enough from starting point
     if (!this.inGestureMode) {
-      this.log('[Mouse Gestures] Movement detected - entering gesture mode');
-      this.inGestureMode = true;
-      this.suppressContextMenu = true;
-      // Create trail if not already created
-      if (!this.trailSvg) {
-        this.createTrailSvg();
+      const startPoint = this.gesturePoints[0];
+      const dx = e.clientX - startPoint.x;
+      const dy = e.clientY - startPoint.y;
+      const distanceFromStart = Math.sqrt(dx * dx + dy * dy);
+
+      if (distanceFromStart >= this.movementThreshold) {
+        this.log('[Mouse Gestures] Movement threshold reached - entering gesture mode');
+        this.inGestureMode = true;
+        this.suppressContextMenu = true;
+        // Create trail if not already created
+        if (!this.trailSvg) {
+          this.createTrailSvg();
+        }
       }
     }
 
-    this.updateTrail();
+    // Only update trail if in gesture mode
+    if (this.inGestureMode) {
+      this.updateTrail();
+    }
   }
 
   handleMouseUp(e) {
@@ -122,6 +143,12 @@ class MouseGestureDetector {
     if (this.longPressTimer) {
       clearTimeout(this.longPressTimer);
       this.longPressTimer = null;
+    }
+
+    // Clear the gesture timeout timer
+    if (this.gestureTimeoutTimer) {
+      clearTimeout(this.gestureTimeoutTimer);
+      this.gestureTimeoutTimer = null;
     }
 
     // Only handle right-click release
@@ -149,6 +176,32 @@ class MouseGestureDetector {
 
     this.removeTrail();
     this.gesturePoints = [];
+  }
+
+  cancelGesture() {
+    this.log('[Mouse Gestures] Canceling gesture (timeout)');
+
+    // Clear timers
+    if (this.longPressTimer) {
+      clearTimeout(this.longPressTimer);
+      this.longPressTimer = null;
+    }
+    if (this.gestureTimeoutTimer) {
+      clearTimeout(this.gestureTimeoutTimer);
+      this.gestureTimeoutTimer = null;
+    }
+
+    // Reset state
+    this.isDrawing = false;
+    this.inGestureMode = false;
+    this.suppressContextMenu = false;
+    this.gestureDrawn = false;
+
+    // Remove trail
+    this.removeTrail();
+    this.gesturePoints = [];
+
+    // Silent cancel - no toast, no context menu
   }
 
   handleContextMenu(e) {
